@@ -6,7 +6,7 @@ USE  IEEE.STD_LOGIC_UNSIGNED.all;
 ENTITY LCD_Display IS
 -- Enter number of live Hex hardware data values to display
 -- (do not count ASCII character constants)
-   GENERIC(Num_Hex_Digits: Integer:= 2); 
+   GENERIC(Num_Hex_Digits: Integer:= 3); 
 -----------------------------------------------------------------------
 -- LCD Displays 16 Characters on 2 lines
 -- LCD_display string is an ASCII character string entered in hex for 
@@ -39,14 +39,16 @@ ENTITY LCD_Display IS
 -- Example "A" is row 4 column 1, so hex value is X"41"
 -- *see LCD Controller's Datasheet for other graphics characters available
 --
-   PORT( KEY 	: IN STD_LOGIC_VECTOR(0 downto 0);
-		 CLOCK_50       : IN  STD_LOGIC;
+   PORT( KEY         : IN STD_LOGIC_VECTOR(0 downto 0);
+       CLOCK_50       : IN  STD_LOGIC;
        Hex_Display_Data       : IN    STD_LOGIC_VECTOR((Num_Hex_Digits*4)-1 DOWNTO 0);
        LCD_RS, LCD_EN          : OUT STD_LOGIC;
        LCD_RW                 : OUT   STD_LOGIC;
        LCD_ON                 : OUT STD_LOGIC;
-       --LCD_BLON               : OUT STD_LOGIC; Backlight not used in DE2 model
-       LCD_DATA               : INOUT  STD_LOGIC_VECTOR(7 DOWNTO 0));
+       LCD_DATA               : INOUT  STD_LOGIC_VECTOR(7 DOWNTO 0);
+		 inch_cent_switch			: IN STD_LOGIC; -- 0 == inch, 1 == cent
+		 lds							: IN STD_LOGIC_VECTOR(15 DOWNTO 0) -- length display string
+		 );
       
 END ENTITY LCD_Display;
 
@@ -61,19 +63,35 @@ SIGNAL   state, next_command           : STATE_TYPE;
 SIGNAL   LCD_display_string            : character_string;
 
 -- Enter new ASCII hex data above for LCD Display
-SIGNAL 	reset	: std_logic;
+SIGNAL         reset        : std_logic;
 SIGNAL   LCD_DATA_VALUE, Next_Char     : STD_LOGIC_VECTOR(7 DOWNTO 0);
 SIGNAL   CLK_COUNT_400HZ               : STD_LOGIC_VECTOR(19 DOWNTO 0);
 SIGNAL   CHAR_COUNT                 : STD_LOGIC_VECTOR(4 DOWNTO 0);
 SIGNAL   CLK_400HZ_Enable,LCD_RW_INT   : STD_LOGIC;
 SIGNAL   Line1_chars, Line2_chars      : STD_LOGIC_VECTOR(127 DOWNTO 0);
+
+FUNCTION ldd(inbit : STD_LOGIC) RETURN STD_LOGIC_VECTOR IS -- length display decode
+	VARIABLE disp_out : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	VARIABLE stupid_input : STD_LOGIC;
+BEGIN
+	IF(inbit = '0') THEN
+		disp_out := "00100000";
+	ELSIF(inbit = '1') THEN
+		disp_out := "00100101";
+	END IF;
+
+	--WITH stupid_input SELECT
+	--	disp_out <= "00100101" WHEN '1',
+	--					"00100000" WHEN '0';
+	RETURN disp_out;
+END ldd;
+
 BEGIN
 
 LCD_ON      <= '1';
 -- LCD_BLON    <= '1'; backlight unused
-reset <= NOT KEY(0);
+reset <= KEY(0);
 
-LCD_display_string <= (
 -- ASCII hex values for LCD Display
 -- Enter Live Hex Data Values from hardware here
 -- LCD DISPLAYS THE FOLLOWING:
@@ -81,12 +99,27 @@ LCD_display_string <= (
 --| Count=XX                  |
 --| DE2                       |
 ------------------------------
+WITH inch_cent_switch SELECT
+	LCD_display_string <= (
 -- Line 1
-	X"43",X"4F",X"52",X"59",X"20",X"20",X"20",X"20",
-   X"20",X"20",X"20",X"20",X"20",X"20",X"20",X"20",
+		X"0" & Hex_Display_Data(11 DOWNTO 8),X"0" & Hex_Display_Data(7 DOWNTO 4),X"0" & Hex_Display_Data(3 DOWNTO 0),X"20",X"49",X"4E",X"20",X"20",
+		X"20",X"20",X"20",X"20",X"20",X"20",X"20",X"20",
 -- Line 2
-   X"44",X"45",X"32",X"20",X"20",X"20",X"20",X"20",
-   X"20",X"20",X"20",X"20",X"20",X"20",X"20",X"20");
+		ldd(lds(15)),ldd(lds(14)),ldd(lds(13)),ldd(lds(12)),ldd(lds(11)),ldd(lds(10)),ldd(lds(9)),ldd(lds(8)),
+		ldd(lds(7)),ldd(lds(6)),ldd(lds(5)),ldd(lds(4)),ldd(lds(3)),ldd(lds(2)),ldd(lds(1)),ldd(lds(0))) WHEN '1',
+		--X"44",X"45",X"32",X"20",X"20",X"20",X"20",X"20",
+		--X"20",X"20",X"20",X"20",X"20",X"20",X"20",X"20") WHEN '1',
+
+	(
+-- Line 1
+		X"0" & Hex_Display_Data(11 DOWNTO 8),X"0" & Hex_Display_Data(7 DOWNTO 4),X"0" & Hex_Display_Data(3 DOWNTO 0),X"20",X"43",X"4D",X"20",X"20",
+		X"20",X"20",X"20",X"20",X"20",X"20",X"20",X"20",
+-- Line 2
+		ldd(lds(15)),ldd(lds(14)),ldd(lds(13)),ldd(lds(12)),ldd(lds(11)),ldd(lds(10)),ldd(lds(9)),ldd(lds(8)),
+		ldd(lds(7)),ldd(lds(6)),ldd(lds(5)),ldd(lds(4)),ldd(lds(3)),ldd(lds(2)),ldd(lds(1)),ldd(lds(0))) WHEN '0';
+		--X"44",X"45",X"32",X"20",X"20",X"20",X"20",X"20",
+		--X"20",X"20",X"20",X"20",X"20",X"20",X"20",X"20") WHEN '0';
+		
 
 -- BIDIRECTIONAL TRI STATE LCD DATA BUS
    LCD_DATA <= LCD_DATA_VALUE WHEN LCD_RW_INT = '0' ELSE "ZZZZZZZZ";
