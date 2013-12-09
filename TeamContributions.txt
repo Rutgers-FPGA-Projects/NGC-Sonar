@@ -9,13 +9,16 @@ First Implementation of Code using Parallax Ping Sensor: David Shen
 note: code did not function properly, but gave an idea on how sensor operated.
 
 Reworked Code: Cory Pisano, Kyle Cavorley, Andrew Weiser
-note: code still did not function properly. LED indicators and oscilloscope/spectrum analyzer testing indicating
+note: Code still did not completely function properly. We rewrote the inital implementation which helped to understand 
+and fix some bugs.   We created LED indicators and oscilloscope/spectrum analyzer testing indicating
 a chirp is emitted. Problem occurs in reception of echo with parallax ping sensor
 
 Working Code: David Shen, Kyle Cavorley, Cory Pisano, Andrew Weiser
 note: Too much difficulty when implementing parallax ping sensor. Figured out GPIO pins cannot send and receive signals
 from a single pin. Switched to using HC-SR04 sensor. Reworked code implemented previously worked for sensor. David modified code
-to fit new sensor. Added distance and centimeter calculation. Able to change sampling frequency. Added Distance indicator.
+to fit new sensor. Added distance and centimeter calculation. Able to change sampling frequency. Added Distance bar indicator.
+
+Other attempted features - VGA (Kyle Cavorley, Cory Pisano), Serial (Andrew Weiser)
 
 Github Repository: 
 https://github.com/Rutgers-FPGA-Projects/NGC-Sonar.git
