@@ -72,17 +72,12 @@ SIGNAL   Line1_chars, Line2_chars      : STD_LOGIC_VECTOR(127 DOWNTO 0);
 
 FUNCTION ldd(inbit : STD_LOGIC) RETURN STD_LOGIC_VECTOR IS -- length display decode
 	VARIABLE disp_out : STD_LOGIC_VECTOR(7 DOWNTO 0);
-	VARIABLE stupid_input : STD_LOGIC;
 BEGIN
 	IF(inbit = '0') THEN
 		disp_out := "00100000";
 	ELSIF(inbit = '1') THEN
-		disp_out := "00100101";
+		disp_out := "00100011";
 	END IF;
-
-	--WITH stupid_input SELECT
-	--	disp_out <= "00100101" WHEN '1',
-	--					"00100000" WHEN '0';
 	RETURN disp_out;
 END ldd;
 
@@ -107,8 +102,6 @@ WITH inch_cent_switch SELECT
 -- Line 2
 		ldd(lds(15)),ldd(lds(14)),ldd(lds(13)),ldd(lds(12)),ldd(lds(11)),ldd(lds(10)),ldd(lds(9)),ldd(lds(8)),
 		ldd(lds(7)),ldd(lds(6)),ldd(lds(5)),ldd(lds(4)),ldd(lds(3)),ldd(lds(2)),ldd(lds(1)),ldd(lds(0))) WHEN '1',
-		--X"44",X"45",X"32",X"20",X"20",X"20",X"20",X"20",
-		--X"20",X"20",X"20",X"20",X"20",X"20",X"20",X"20") WHEN '1',
 
 	(
 -- Line 1
@@ -117,10 +110,7 @@ WITH inch_cent_switch SELECT
 -- Line 2
 		ldd(lds(15)),ldd(lds(14)),ldd(lds(13)),ldd(lds(12)),ldd(lds(11)),ldd(lds(10)),ldd(lds(9)),ldd(lds(8)),
 		ldd(lds(7)),ldd(lds(6)),ldd(lds(5)),ldd(lds(4)),ldd(lds(3)),ldd(lds(2)),ldd(lds(1)),ldd(lds(0))) WHEN '0';
-		--X"44",X"45",X"32",X"20",X"20",X"20",X"20",X"20",
-		--X"20",X"20",X"20",X"20",X"20",X"20",X"20",X"20") WHEN '0';
 		
-
 -- BIDIRECTIONAL TRI STATE LCD DATA BUS
    LCD_DATA <= LCD_DATA_VALUE WHEN LCD_RW_INT = '0' ELSE "ZZZZZZZZ";
 
