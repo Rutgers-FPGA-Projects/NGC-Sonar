@@ -8,10 +8,14 @@ Parallax Ping Research: Kyle Cavorley
 First Implementation of Code using Parallax Ping Sensor: David Shen 
 note: code did not function properly, but gave an idea on how sensor operated.
 
-Reworked Code: Cory Pisano, Kyle Cavorley, Andrew Weiser
+Reworked Code for Parallax Ping Sensor: Cory Pisano, Kyle Cavorley, Andrew Weiser
 note: Code still did not completely function properly. We rewrote the inital implementation which helped to understand 
 and fix some bugs.   We created LED indicators and oscilloscope/spectrum analyzer testing indicating
-a chirp is emitted. Problem occurs in reception of echo with parallax ping sensor
+a chirp is emitted. Problem occurs in reception of echo with parallax ping sensor. The signal pin that sends the chirp and receives
+the echo is connected to the same pin on the logic converter. This is connected to a single GPIO pin. After continuously
+debugging and reworking our code, we had many issues in achieving proper functionality of the Parallax Ping Sensor.
+We tried implementing tri-state buffers, however our code did not work. When hooking up the HC-SR04 sensor, our code immediately
+worked.
 
 Working Code: David Shen, Kyle Cavorley, Cory Pisano, Andrew Weiser
 note: Too much difficulty when implementing parallax ping sensor. Figured out GPIO pins cannot send and receive signals
@@ -19,6 +23,15 @@ from a single pin. Switched to using HC-SR04 sensor. Reworked code implemented p
 to fit new sensor. Added distance and centimeter calculation. Able to change sampling frequency. Added Distance bar indicator.
 
 Other attempted features - VGA (Kyle Cavorley, Cory Pisano), Serial (Andrew Weiser)
+
+Challenges:
+Our biggest challenge was implementing the Parallax Ping Sensor. We could not get the bi-directional signal pin to 
+function properly. Running out of time in our project, we switched to the HC-SR04 sensor. The issue with the sensor offset 
+our initial goal of implementing multiple sensors so that we could do more with the project, such as create an 
+atari pong game. We were also planning on implementing a serial connection to the computer to store the distance data points
+to Matlab where they could be graphed. Further research is required in implementing the parallax ping sensor. However,
+with a working HC-SR04 sensor, we will be able to meet our goals. This can be done in a capstone project next semester
+or research. 
 
 Github Repository: 
 https://github.com/Rutgers-FPGA-Projects/NGC-Sonar.git
